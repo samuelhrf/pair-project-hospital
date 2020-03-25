@@ -1,0 +1,48 @@
+<!-- Extra Functions -->
+<% include ('../partials/extraJS.ejs') %>
+
+<!-- Title and Menu Content -->
+<%
+    const title = 'Movies Database';
+    const menuItems = [
+        ['Home', '/'],
+        ['Production Houses', '/productionhouses'],
+        ['Movies', '/movies']
+    ];
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="//kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+
+<body class="mw-100 mh-100">
+
+    <!-- Title Bar -->
+    <nav class="navbar navbar-dark fixed-top bg-dark p-0 shadow">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#"><%= title %></a>
+    </nav>
+
+    <!-- Menu Sidebar -->
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="min-vh-100 col-md-2 d-none d-md-block bg-light sidebar pt-5">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <% for (let i in menuItems) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= menuItems[i][1] %>">
+                                <%= menuItems[i][0] %>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </nav>
+            <main class="col-md-9 ml-sm-auto col-lg-10 p-4 pt-5">
