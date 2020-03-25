@@ -1,0 +1,57 @@
+npm init -y
+npm i pg ejs express sequelize sequelize-cli
+npx sequelize-cli init
+
+/// generate model
+npx sequelize-cli model:generate --name Ward --attributes name:string
+npx sequelize-cli model:generate --name Doctor --attributes WardId:integer,InfoId:integer,consultationPrice:integer
+npx sequelize-cli model:generate --name Patient --attributes InfoId:integer
+npx sequelize-cli model:generate --name Info --attributes firstName:string,lastName:string,address:string,dateOfBirth:string,gender:string
+npx sequelize-cli model:generate --name DoctorConsultation --attributes DoctorId:integer,ConsultationId:integer
+npx sequelize-cli model:generate --name Consultation --attributes PatientId:integer,diagnosis:string,checkout:boolean
+/// migrate
+npx sequelize-cli db:migrate
+/// generate seed
+npx sequelize-cli seed:generate --name demo-wards
+npx sequelize-cli seed:generate --name demo-doctors
+npx sequelize-cli seed:generate --name demo-patients
+npx sequelize-cli seed:generate --name demo-infos
+npx sequelize-cli seed:generate --name demo-doctorconsultations
+npx sequelize-cli seed:generate --name demo-consultations
+/// seed text
+'use strict';
+
+const tableName = 'Wards';
+
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.bulkInsert(tableName, [
+      {
+        name: 'General',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'Dentist',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+    ]);
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.bulkDelete(tableName, null, {});
+  }
+};
+
+/// seed
+npx sequelize-cli db:seed:all
+
+/// undo
+npx sequelize-cli db:migrate:undo:all
+npx sequelize-cli db:seed:undo:all
+
+///
+A.hasOne(B) 1:1 FK @ B
+A.belongsToOne(B) 1:1 FK @ A
+A.hasMany(B) 1:M FK @ B
+A.belongsToMany(B, { through: 'C' }) M:M FK @ C
