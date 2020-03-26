@@ -1,36 +1,36 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Doctors', {
+    return queryInterface.createTable('doctors', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      WardId: {
+      ward_id: {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      InfoId: {
+      info_id: {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      consultationPrice: {
+      consultation_price: {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Doctors');
+    return queryInterface.dropTable('doctors');
   }
 };

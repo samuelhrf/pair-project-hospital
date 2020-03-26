@@ -1,0 +1,42 @@
+
+wards: 
+    type: list
+    isi: ward(clickable -> ward individual)
+    actions: tambah, delete, edit
+ward individual: 
+    type: list
+    isi: nama ward,
+        doctors(clickable -> doctors per ward)
+    actions: tambah, delete, edit
+doctors: 
+    type: list
+    isi: doctor(clickable -> doctor individual)
+    actions: tambah, delete, edit
+doctor individual: 
+    type: list
+    isi: nama doctor,
+        ward(clickable -> ward individual), 
+        consultations(clickable -> consultations per doctor), 
+        price per consultation,
+        tombol info(clickable -> info individual)
+    actions: tambah, delete, edit
+consultations: 
+    type: list
+    isi: consultation(clickable -> consultation individual)
+    actions: tambah, delete, edit
+consultation individual: 
+    type: list
+    isi: doctor(clickable -> doctor individual),
+        patient(clickable -> patient individual),
+        diagnosis,
+        status
+    actions: tambah, delete, edit
+patients: 
+    type: list
+    isi: patient(clickable -> patient individual)
+    actions: tambah, delete, edit
+patient individual: 
+    type: list
+    isi: consultations(clickable -> consultations per patient),
+        tombol info(clickable -> info individual)
+    actions: tambah, delete, edit

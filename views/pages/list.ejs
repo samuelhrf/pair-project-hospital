@@ -1,0 +1,37 @@
+<%- include ('../partials/header.ejs') %>
+<table class="table m-0">
+    <!-- Table Headers -->
+    <% if (data.length < 1) {%>
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                <% if (typeof search == 'undefined') {%>
+                <h3>There are no <%= modelName.toLowerCase() %>s, please <a
+                        href="/<%= modelName.toLowerCase() %>s/add">add a new
+                        <%= modelName.toLowerCase() %></a>!</h3>
+                <% } %>
+            </th>
+        </tr>
+    </thead>
+    <% } else { %>
+    <thead class="thead-dark">
+        <tr>
+            <% for (let key in data[0]) { %>
+            <%- helper.getDisplayItems(data[0], key, modelName, false) %>
+            <% } %>
+            <%- helper.getOptions(data, null, modelName, false) %>
+        </tr>
+    </thead>
+    <!-- Table Body -->
+    <tbody>
+        <% for (let i in data) { %>
+        <tr>
+            <% for (let key in data[i]) { %>
+            <%- helper.getDisplayItems(data[i], key, modelName, true) %>
+            <% } %>
+            <%- helper.getOptions(data, i, modelName, true) %>
+        </tr>
+        <% }} %>
+    </tbody>
+</table>
+<%- include ('../partials/footer.ejs') %>
