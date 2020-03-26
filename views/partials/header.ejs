@@ -3,7 +3,7 @@
     const title = 'Hospital Database';
     const menuItems = [
         ['Home', '/'],
-        ['', ''],
+        ['', ''],           // Empty berarti bakal show up sebagai spacer saja
         ['New Consultation', '/consultations/add'],
         ['Checkout', '/consultations/search?columnName=checked_out&value=false'],
         ['', ''],
@@ -39,9 +39,13 @@
                     <ul class="nav flex-column">
                         <% for (let i in menuItems) { %>
                         <li class="nav-item">
+                            <% if (menuItems[i][0] != '' && menuItems[i][1] != '') { %>
                             <a class="nav-link" href="<%= menuItems[i][1] %>">
                                 <%= menuItems[i][0] %>
                             </a>
+                            <% } else { %>
+                            <p></p>
+                            <% } %>
                         </li>
                         <% } %>
                     </ul>
