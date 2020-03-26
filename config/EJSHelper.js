@@ -7,10 +7,12 @@ class Helper {
                 text: '',
 
             },
+            // Inputs to be required per page
             reqInputsMap: {
                 Ward: ['name'],
                 Doctor: ['ward_id', 'consultation_price',]
             },
+            // Display item html (per column)
             displayMap: {
                 Doctor: `<a href="/doctors/search?columnName={{COLUMN_NAME}}&value={{ID}}">{{FULL_NAME}}</a>`,
                 name: `<a href='/doctors/search?columnName={{COLUMN_NAME}}&value={{ID}}'>{{WARD_NAME}} Ward's Doctors</a>`,
@@ -19,6 +21,7 @@ class Helper {
                 Consultations: `<a href='/consultations/search?columnName={{COLUMN_NAME}}&value={{ID}}'>{{FULL_NAME}}'s Consultations</a>`,
                 checked_out: `{{CHECKED_OUT}}`
             },
+            // Link override on display item (Page => Column)
             displayLinkOverrides: {
                 Doctor: {
                     Ward: {
@@ -43,12 +46,14 @@ class Helper {
                     }
                 }
             },
+            // Options (per page)
             optionMap: {
                 Ward: ['edit', 'delete', 'add'],
                 Doctor: ['edit', 'delete', 'add'],
                 Patient: ['edit', 'delete', 'add'],
                 Consultation: ['edit', 'add', 'checked_out']
             },
+            // Columns to be hidden
             hideMap: [
                 'ward_id',
                 'info_id',
