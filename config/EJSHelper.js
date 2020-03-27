@@ -19,7 +19,7 @@ class Helper {
                 Patient: `<a href="/patients/search?columnName={{COLUMN_NAME}}&value={{ID}}">{{FULL_NAME}}</a>`,
                 Ward: `<a href="/doctors/search?columnName={{COLUMN_NAME}}&value={{ID}}">{{WARD_NAME}} Ward's Doctors</a>`,
                 Consultations: `<a href='/consultations/search?columnName={{COLUMN_NAME}}&value={{ID}}'>{{FULL_NAME}}'s Consultations</a>`,
-                checked_out: `{{CHECKED_OUT}}`
+                checked_out: '{{STATUS}}'
             },
             // Link override on display item (Page => Column)
             displayLinkOverrides: {
@@ -46,12 +46,16 @@ class Helper {
                     }
                 }
             },
+            // Replaces Titles (Column names)
+            titleReplacers: {
+                'checked_out': 'status'
+            },
             // Options (per page)
             optionMap: {
                 Ward: ['edit', 'delete', 'add'],
                 Doctor: ['edit', 'delete', 'add'],
                 Patient: ['edit', 'delete', 'add'],
-                Consultation: ['edit', 'add', 'checked_out']
+                Consultation: ['edit', 'add', 'checked_out', 'cancel']
             },
             // Columns to be hidden
             hideMap: [
@@ -64,7 +68,8 @@ class Helper {
                 'patient_id',
                 'PatientId',
                 'doctor_id',
-                'DoctorId'
+                'DoctorId',
+                'canceled'
             ]
         }
     }
@@ -79,6 +84,15 @@ class Helper {
             .join(' ');
     }
 
+    // Replaces title names where available
+    static replaceTitles(str) {
+        const consts = Helper.consts;
+        if (typeof consts.titleReplacers[str] !== 'undefined')
+            return consts.titleReplacers[str];
+        return str;
+    }
+
+    // Checks if a column should be hidden
     static isHidden(data, key) {
         const consts = Helper.consts;
         if (consts.hideMap.includes(key) && typeof data[key] !== 'object')
@@ -127,19 +141,19 @@ class Helper {
     }
 
     static getFormInput(array, key, modelName) {
-        if (Object.prototype.toString.call(date) === '[object Object]') array[key] = undefined;
+        if (Object.prototype.toString.call(array[key]) === '[object Object]') array[key] = undefined;
         switch (key) {
-            case 'genre':
-                return `<select class="custom-select custom-select mt-3" name="genre">
-                        ${ Helper.getGenreDropdown(array, key)};
-                    </select>`;
-            case 'ProductionHouseId':
-                return `<select class="custom-select custom-select mt-3" name="ProductionHouseId">
-                        ${ Helper.getProdHouseDropdown(array, key)};
-                    </select>`;
-            case 'released_year':
-                return `<input id="${key}" ${isNullAllowed(modelName, key)} name="${key}" type="number" class="form-control mt-3" 
-                    min="1900" max="${ new Date().getFullYear() + 5}" step="1" placeholder="${Helper.processTitles(key)}" value="${Helper.getValue(array, key)}">`
+            // case 'genre':
+            //     return `<select class="custom-select custom-select mt-3" name="genre">
+            //             ${ Helper.getGenreDropdown(array, key)};
+            //         </select>`;
+            // case 'ProductionHouseId':
+            //     return `<select class="custom-select custom-select mt-3" name="ProductionHouseId">
+            //             ${ Helper.getProdHouseDropdown(array, key)};
+            //         </select>`;
+            // case 'released_year':
+            //     return `<input id="${key}" ${isNullAllowed(modelName, key)} name="${key}" type="number" class="form-control mt-3" 
+            //         min="1900" max="${ new Date().getFullYear() + 5}" step="1" placeholder="${Helper.processTitles(key)}" value="${Helper.getValue(array, key)}">`
             default:
                 return `<input id="${key}" ${Helper.isNullAllowed(modelName, key)} name="${key}" type="text" class="form-control mt-3"
                     placeholder="${ Helper.processTitles(key)}" value="${Helper.getValue(array, key)}">`
@@ -168,6 +182,40 @@ class Helper {
         return result;
     }
 
+    static getDropdown(data, key, allModelDatas) {
+        // key eg 'patient_id'
+        const modelName = processTitles(key)[0];
+        let modelData;
+        let htmlResult = '';
+
+        if (typeof allModelDatas[modelName] !== 'undefined') {
+            if (!Array.isArray(allModelDatas[modelName])) {
+                modelData = [allModelDatas[modelName]];
+            }
+            else {
+                modelData = allModelDatas[modelName]
+            }
+            // for (let i in choices) {
+            //     if (choices[i] == array[key])
+            //         htmlResult += `<option selected="selected" value="${choices[i]}">${Helper.processTitles(choices[i])}</option>\n`;
+            //     else
+            //         htmlResult += `<option value="${choices[i]}">${Helper.processTitles(choices[i])}</option>\n`;
+            // }
+            for (let i in modelData) {
+                if (choices[i] == array[key])
+                    htmlResult += `<option selected="selected" value="${choices[i]}">${Helper.processTitles(choices[i])}</option>\n`;
+                else
+                    htmlResult += `<option value="${choices[i]}">${Helper.processTitles(choices[i])}</option>\n`;
+            }
+        }
+        else
+            htmlResult += `<option selected="selected" value="ERROR">ERROR: Model Data not found!</option>\n`
+
+        return htmlResult;
+    }
+
+    static getName(model) { }
+
     static getGenreDropdown(array, key, choices) {
         // const choices = [
         //     'animation',
@@ -193,15 +241,23 @@ class Helper {
         return array[key];
     }
 
+    // Returns the status in the form of html
+    static getConsultationStatus(checked_out, canceled) {
+        if (checked_out)
+            return '<div class="btn btn-secondary btn-xs" style="pointer-events: none">Checked Out</div>';
+        else if (canceled)
+            return '<div class="btn btn-danger btn-xs" style="pointer-events: none">Canceled</div>';
+        else
+            return '<div class="btn btn-success btn-xs" style="pointer-events: none">Active</div>'
+    }
 
     // Formats the table items
     static formatDisplay(data, key, modelName) {
         const consts = Helper.consts;
-        // console.log(data, key, modelName)
         let arr = [];
-        // console.log(key, consts.displayMap[key])
         if (typeof data[key] !== 'undefined' &&
-            typeof consts.displayMap[key] !== 'undefined') {
+            typeof consts.displayMap[key] !== 'undefined' &&
+            data[key] !== null) {
             if (!Array.isArray(data[key])) {
                 arr = [data[key]];
             }
@@ -238,10 +294,11 @@ class Helper {
                 .replace(/{{WARD_NAME}}/, key == 'Ward' ? arr[i]['name'] : '{{WARD_NAME}}')
                 .replace(/{{WARD_NAME}}/, key == 'name' && modelName == 'Ward' ? data['name'] : '{{WARD_NAME}}')
                 .replace(/{{FULL_NAME}}/, key == 'Consultations' ? data['full_name'] : '{{FULL_NAME}}')
-                .replace(/{{CHECKED_OUT}}/, key == 'checked_out' ? data['checked_out'] : '{{CHECKED_OUT}}')
+                .replace(/{{STATUS}}/, key == 'checked_out' ? Helper.getConsultationStatus(data['checked_out'], data['canceled']) : '{{STATUS}}')
             );
             // console.log(consts.displayMap[key], result)
         }
+        console.log(Helper.unknownIfEmpty(result.join(',')))
         return Helper.unknownIfEmpty(result.join(','));
     }
 
@@ -261,10 +318,17 @@ class Helper {
                         class="btn btn-info btn-xs ml-1" role="button">Edit</a>`;
                 if (consts.optionMap[modelName].includes('delete'))
                     resultHtml += `<a href="/${modelName.toLowerCase()}s/delete/${data[key].id}"
-                                class="btn btn-danger btn-xs ml-1" role="button">Delete</a>`;
-                if (consts.optionMap[modelName].includes('checked_out') && !data[key].checked_out)
+                        class="btn btn-danger btn-xs ml-1" role="button">Delete</a>`;
+                if (consts.optionMap[modelName].includes('cancel') &&
+                    consts.optionMap[modelName].includes('checked_out') &&
+                    !data[key].checked_out && !data[key].canceled)
                     resultHtml += `<a href="/checkout/${data[key].id}"
-                                        class="btn btn-primary btn-xs ml-1" role="button">Checkout</a>`;
+                        class="btn btn-primary btn-xs ml-1" role="button">Checkout</a>`;
+                if (consts.optionMap[modelName].includes('cancel') &&
+                    consts.optionMap[modelName].includes('checked_out') &&
+                    !data[key].checked_out && !data[key].canceled)
+                    resultHtml += `<a href="/cancel/${data[key].id}"
+                        class="btn btn-danger btn-xs ml-1" role="button">Cancel</a>`;
                 resultHtml += '</td>';
             }
         }
@@ -277,7 +341,7 @@ class Helper {
         let resultHtml = '';
         if (!isBody) {
             if (!Helper.isHidden(data, key)) {
-                resultHtml += `<th>${Helper.processTitles(key)}</th>`;
+                resultHtml += `<th>${Helper.processTitles(Helper.replaceTitles(key))}</th>`;
             }
         }
         else {

@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     patient_id: DataTypes.INTEGER,
     doctor_id: DataTypes.INTEGER,
     diagnosis: DataTypes.STRING,
-    checked_out: DataTypes.BOOLEAN
+    checked_out: DataTypes.BOOLEAN,
+    canceled: DataTypes.BOOLEAN
   }, {});
   Consultation.associate = function (models) {
     Consultation.belongsTo(models.Patient);

@@ -1,0 +1,19 @@
+<%- include ('../partials/header.ejs') %>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title text-center">Edit <%= modelName %>: ID = <%= data.id %></h5>
+        <form style="text-align: left" action="/<%= modelName.toLowerCase() %>s/edit/<%= data.id %>" method="post">
+            <% for (let key in data) { %>
+            <% if (key != "id") {%>
+            <div class="form-group">
+                <label class="ml-2 mb-0 mt-1" for="<%= key %>"><%= helper.processTitles(key) %></label>
+                <div>
+                    <%- helper.getFormInput(data,key) %>
+                </div>
+            </div>
+            <% }} %>
+            <button class="btn btn-lg btn-primary btn-block text-uppercase mt-3" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+<%- include ('../partials/footer.ejs') %>

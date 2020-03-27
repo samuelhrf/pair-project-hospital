@@ -1,37 +1,65 @@
 <%- include ('../partials/header.ejs') %>
-<table class="table m-0">
-    <!-- Table Headers -->
-    <% if (data.length < 1) {%>
-    <thead class="thead-dark">
-        <tr>
-            <th>
-                <% if (typeof search == 'undefined') {%>
-                <h3>There are no <%= modelName.toLowerCase() %>s, please <a
-                        href="/<%= modelName.toLowerCase() %>s/add">add a new
-                        <%= modelName.toLowerCase() %></a>!</h3>
+<div class="card">
+    <div class="card-header border-0">
+        <nav class="navbar navbar-light bg-light justify-content-between">
+            <form class="form-inline">
+                <a class="navbar-brand"><%= modelName %>s</a>
+                <a href="/<%= modelName.toLowerCase() %>s/add" class="">
+                    <i class="fas fa-plus-circle"></i>
+                </a>
+            </form>
+            <% if (data.length > 0 || typeof search != 'undefined') {%>
+            <form class="form-inline" action="/<%= modelName.toLowerCase() %>s/search">
+                <select class="custom-select custom-select mr-1" name="columnName">
+                    <% if (typeof search == 'undefined' || data.length > 0) {%>
+                    <% for (let key in data[0]) { %>
+                    <option value="<%= key %>"><%= helper.processTitles(key) %></option>
+                    <% }} else { %>
+                    <option value="<%= search['columnName'] %>">
+                        <%= helper.processTitles(search['columnName']) %>
+                    </option>
+                    <% } %>
+                </select> <input class="form-control mr-sm-2" name="value" type="search" placeholder="Search"
+                    aria-label="Search">
+                <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">
+            </form>
+            <% } %>
+        </nav>
+    </div>
+    <table class="table m-0">
+        <!-- Table Headers -->
+        <% if (data.length < 1) {%>
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    <% if (typeof search == 'undefined') {%>
+                    <h3>There are no <%= modelName.toLowerCase() %>s, please <a
+                            href="/<%= modelName.toLowerCase() %>s/add">add a new
+                            <%= modelName.toLowerCase() %></a>!</h3>
+                    <% } %>
+                </th>
+            </tr>
+        </thead>
+        <% } else { %>
+        <thead class="thead-dark">
+            <tr>
+                <% for (let key in data[0]) { %>
+                <%- helper.getDisplayItems(data[0], key, modelName, false) %>
                 <% } %>
-            </th>
-        </tr>
-    </thead>
-    <% } else { %>
-    <thead class="thead-dark">
-        <tr>
-            <% for (let key in data[0]) { %>
-            <%- helper.getDisplayItems(data[0], key, modelName, false) %>
-            <% } %>
-            <%- helper.getOptions(data, null, modelName, false) %>
-        </tr>
-    </thead>
-    <!-- Table Body -->
-    <tbody>
-        <% for (let i in data) { %>
-        <tr>
-            <% for (let key in data[i]) { %>
-            <%- helper.getDisplayItems(data[i], key, modelName, true) %>
-            <% } %>
-            <%- helper.getOptions(data, i, modelName, true) %>
-        </tr>
-        <% }} %>
-    </tbody>
-</table>
+                <%- helper.getOptions(data, null, modelName, false) %>
+            </tr>
+        </thead>
+        <!-- Table Body -->
+        <tbody>
+            <% for (let i in data) { %>
+            <tr>
+                <% for (let key in data[i]) { %>
+                <%- helper.getDisplayItems(data[i], key, modelName, true) %>
+                <% } %>
+                <%- helper.getOptions(data, i, modelName, true) %>
+            </tr>
+            <% }} %>
+        </tbody>
+    </table>
+</div>
 <%- include ('../partials/footer.ejs') %>

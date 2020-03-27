@@ -11,6 +11,7 @@ module.exports = {
         doctor_id: 1,
         diagnosis: 'Corona',
         checked_out: false,
+        canceled: false,
         created_at: new Date(),
         updated_at: new Date()
       },
@@ -19,6 +20,7 @@ module.exports = {
         doctor_id: 2,
         diagnosis: 'Kemageran',
         checked_out: false,
+        canceled: false,
         created_at: new Date(),
         updated_at: new Date()
       }

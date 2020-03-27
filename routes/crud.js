@@ -3,9 +3,9 @@ const Controller = require('../controller/Controller');
 
 // GET Methods
 router.get(`/`, Controller.pageList);
-// router.get(`/add`, Controller.pageAdd);
-// router.get(`/edit/:id`, Controller.pageEdit);
-// router.get(`/delete/:id`, Controller.delete);
+router.get(`/add`, Controller.pageAdd);
+router.get(`/edit/:id`, Controller.pageEdit);
+router.get(`/delete/:id`, Controller.delete);
 router.get('/search', Controller.search);
 
 // // POST Methods

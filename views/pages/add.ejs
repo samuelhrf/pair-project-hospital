@@ -1,0 +1,14 @@
+<%- include ('../partials/header.ejs') %>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title text-center">Add New <%= modelName %></h5>
+        <form class="form-signin" action="/<%= modelName.toLowerCase() %>s/add" method="post">
+            <% for (let key in data) { %>
+            <% if (key != "id") {%>
+            <td><%- helper.getFormInput(data,key) %></td>
+            <% }} %>
+            <button class="btn btn-lg btn-primary btn-block text-uppercase mt-3" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+<%- include ('../partials/footer.ejs') %>

@@ -1,90 +1,141 @@
 const models = require('../models');
 
-// ========== Constants ==========
-const modelConstants = [
-    {
-        page: 'wards',
-        model: models.Ward,
-        include: [
-            {
-                model: models.Doctor, include: [
-                    { model: models.Info }
-                ]
-            }
-        ]
-    },
-    {
-        page: 'doctors',
-        model: models.Doctor,
-        include: [
-            {
-                model: models.Ward
-            },
-            {
-                model: models.Consultation
-            },
-            {
-                model: models.Info
-            }
-        ]
-    },
-    {
-        page: 'consultations',
-        model: models.Consultation,
-        include: [
-            {
-                model: models.Doctor,
-                include: [
-                    { model: models.Info }
-                ]
-            },
-            {
-                model: models.Patient,
-                include: [
-                    { model: models.Info }
-                ]
-            }
-        ]
-    },
-    {
-        page: 'patients',
-        model: models.Patient,
-        include: [
-            {
-                model: models.Consultation
-            },
-            {
-                model: models.Info
-            }
-        ]
-    }
-]
-
-// // Menu Includes
-// const menuIncludes = [
-//     {
-//         model: models.Doctor, include: [
-//             { model: models.Info }
-//         ]
+// static getObject(dataType) {
+//     switch (dataType) {
+//         case 'Teacher':
+//             return {
+//                 first_name: undefined,
+//                 last_name: undefined,
+//                 email: undefined,
+//                 gender: undefined
+//             }
+//         case 'Student':
+//             return {
+//                 first_name: undefined,
+//                 last_name: undefined,
+//                 email: undefined,
+//                 gender: undefined,
+//                 birthdate: undefined
+//             }
+//         case 'Subject':
+//             return {
+//                 subject_name: undefined,
+//             }
 //     }
-// ]
+// }
 
-// Stuff to remove
-const removeMap = [
-    'ward_id',
-    'info_id',
-    'WardId',
-    'InfoId',
-    'createdAt',
-    'updatedAt',
-    'patient_id',
-    'PatientId',
-    'doctor_id',
-    'DoctorId'
-]
-
-// ========== Functions ==========
 class Helper {
+    // ==================== Constants ====================
+    static get consts() {
+        return {
+            // Models and Includes for listview
+            modelConstants: [
+                {
+                    page: 'wards',
+                    model: models.Ward,
+                    include: []
+                },
+                {
+                    page: 'doctors',
+                    model: models.Doctor,
+                    include: [
+                        {
+                            model: models.Ward
+                        },
+                        {
+                            model: models.Consultation
+                        },
+                        {
+                            model: models.Info
+                        }
+                    ]
+                },
+                {
+                    page: 'consultations',
+                    model: models.Consultation,
+                    include: [
+                        {
+                            model: models.Doctor,
+                            include: [
+                                { model: models.Info }
+                            ]
+                        },
+                        {
+                            model: models.Patient,
+                            include: [
+                                { model: models.Info }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    page: 'patients',
+                    model: models.Patient,
+                    include: [
+                        {
+                            model: models.Consultation
+                        },
+                        {
+                            model: models.Info
+                        }
+                    ]
+                }
+            ],
+            // Object map for passing to add and edit
+            objectMap: {
+                Consultation: {
+                    patient_id: undefined,
+                    doctor_id: undefined,
+                    diagnosis: undefined,
+                    checked_out: undefined,
+                    canceled: undefined
+                },
+                Doctor: {
+                    ward_id: undefined,
+                    info_id: undefined,
+                    consultation_price: undefined
+                },
+                Info: {
+                    first_name: undefined,
+                    last_name: undefined,
+                    address: undefined,
+                    date_of_birth: undefined,
+                    gender: undefined
+                },
+                Patient: {
+                    info_id: undefined
+                },
+                Ward: {
+                    name: undefined
+                }
+            },
+            // Stuff to remove
+            removeMap: [
+                // 'ward_id',
+                // 'info_id',
+                // 'WardId',
+                // 'InfoId',
+                'createdAt',
+                'updatedAt',
+                // 'patient_id',
+                // 'PatientId',
+                // 'doctor_id',
+                // 'DoctorId'
+            ]
+        }
+    }
+
+    // ==================== Functions ====================
+    // Converts from 'first_name' to 'FirstName'
+    static pascalCase(str) {
+        return str
+            .split('_')
+            .map(function (word) {
+                return word[0].toUpperCase() + word.substr(1);
+            })
+            .join('');
+    }
+
     // Returns { page, model, dataType, id, search, include }
     static getParams(req) {
         const urlParams = req.originalUrl.split('/').slice(1);
@@ -106,7 +157,7 @@ class Helper {
             }
         }
         for (let i in data) {
-            // data[i] = Helper.removeUnneeded(data[i]);
+            data[i] = Helper.removeUnneeded(data[i]);
             data[i] = Helper.appendInfo(data[i]);
         }
         // console.log(1, data[0])
@@ -115,11 +166,18 @@ class Helper {
 
     // Removes uneeded items
     static removeUnneeded(data) {
+        const consts = Helper.consts;
         for (let key in data) {
-            if (removeMap.includes(key) && typeof data[key] !== 'object') {
-                console.log(key, data[key])
+            if (consts.removeMap.includes(key) && typeof data[key] !== 'object') {
+                // console.log(key, data[key])
                 delete data[key];
             }
+            // Because we use snake_case we need to delete the 
+            // PascalCase that sequelize also returns of the same data
+            const pascalCased = Helper.pascalCase(key);
+            if (typeof data[pascalCased] !== 'undefined' &&
+                pascalCased !== key)
+                delete data[pascalCased];
         }
         return data;
     }
@@ -168,9 +226,10 @@ class Helper {
 
     // Get the model based on page
     static getModel(page) {
-        for (let i in modelConstants) {
-            if (modelConstants[i].page == page)
-                return modelConstants[i].model;
+        const consts = Helper.consts;
+        for (let i in consts.modelConstants) {
+            if (consts.modelConstants[i].page == page)
+                return consts.modelConstants[i].model;
         }
         // On fail
         return null;
@@ -178,9 +237,10 @@ class Helper {
 
     // Gets whats needed to be included based on page
     static getInclude(page) {
-        for (let i in modelConstants) {
-            if (modelConstants[i].page == page)
-                return modelConstants[i].include;
+        const consts = Helper.consts;
+        for (let i in consts.modelConstants) {
+            if (consts.modelConstants[i].page == page)
+                return consts.modelConstants[i].include;
         }
         // On fail
         return [];
